@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>7336 프로리그 참가인원 점수 계산기</title>
   <style>
     :root {
@@ -27,7 +27,7 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
-      padding: 24px;
+      padding: 16px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -39,41 +39,57 @@
       max-width: 1200px;
     }
 
-    /* 최상단 제목 */
+    /* 최상단 제목 (모바일 대응) */
     h1 {
       text-align: center;
-      margin-bottom: 24px;
-      font-size: 2.2rem;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
       font-weight: 800;
       color: var(--accent-color);
       text-shadow: 0 0 15px var(--accent-glow);
       letter-spacing: -0.5px;
+      word-break: keep-all;
+    }
+
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 2.2rem;
+        margin-bottom: 24px;
+      }
+      body {
+        padding: 24px;
+      }
     }
 
     /* 상단 버튼 */
     .tab-buttons {
       display: flex;
       justify-content: center;
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 10px;
+      margin-bottom: 20px;
+      width: 100%;
     }
 
     .tab-btn {
-      padding: 14px 32px;
-      font-size: 1.05rem;
+      flex: 1;
+      max-width: 200px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
       font-weight: 700;
       border: 2px solid var(--accent-color);
       background-color: transparent;
       color: var(--accent-color);
       border-radius: 10px;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.25s ease;
+      text-align: center;
+      white-space: nowrap;
     }
 
     .tab-btn.active, .tab-btn:hover {
       background-color: var(--accent-color);
       color: #0b0f19;
-      box-shadow: 0 0 20px var(--accent-glow);
+      box-shadow: 0 0 15px var(--accent-glow);
     }
 
     /* 탭 메인 컨테이너 */
@@ -82,30 +98,36 @@
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 24px;
+      padding: 16px;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    @media (min-width: 768px) {
+      .tab-content {
+        padding: 24px;
+      }
     }
 
     .tab-content.active {
       display: block;
     }
 
-    /* 팀별 인원 보기 */
+    /* 팀별 인원 보기 카드 그리드 */
     .team-grid-4 {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
+      grid-template-columns: 1fr;
+      gap: 16px;
     }
 
-    @media (max-width: 1100px) {
+    @media (min-width: 600px) {
       .team-grid-4 {
         grid-template-columns: repeat(2, 1fr);
       }
     }
 
-    @media (max-width: 600px) {
+    @media (min-width: 1024px) {
       .team-grid-4 {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
       }
     }
 
@@ -113,17 +135,18 @@
       background-color: var(--card-inner);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .team-card h3 {
       color: var(--accent-color);
       border-bottom: 2px solid var(--border-color);
-      padding-bottom: 10px;
-      margin-bottom: 12px;
-      font-size: 1.25rem;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      font-size: 1.15rem;
       text-align: center;
       font-weight: 700;
     }
@@ -131,13 +154,17 @@
     .member-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      table-layout: fixed;
     }
 
     .member-table th, .member-table td {
-      padding: 8px 4px;
+      padding: 6px 2px;
       text-align: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .member-table th {
@@ -158,156 +185,190 @@
       font-weight: 700;
     }
 
-    /* [수정 1] 팀 선택 영역 줄바꿈 금지 처리 */
+    /* 계산기 헤더 (모바일 분리 및 정렬) */
     .calc-header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 12px;
       background-color: var(--card-inner);
-      padding: 18px 24px;
+      padding: 14px 16px;
       border-radius: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       border: 1px solid var(--border-color);
-      gap: 20px;
-      flex-wrap: nowrap;
+    }
+
+    @media (min-width: 600px) {
+      .calc-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px;
+      }
     }
 
     .team-select-box {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 1.1rem;
+      gap: 10px;
+      font-size: 1rem;
       font-weight: 700;
-      white-space: nowrap;
-      flex-shrink: 0;
+      width: 100%;
     }
 
-    /* 라벨 줄바꿈 방지 지정 */
+    @media (min-width: 600px) {
+      .team-select-box {
+        width: auto;
+      }
+    }
+
     .team-select-box label {
       white-space: nowrap;
       word-break: keep-all;
-      display: inline-block;
+      flex-shrink: 0;
     }
 
     .team-select-box select {
-      font-size: 1rem;
-      padding: 8px 16px;
+      font-size: 0.95rem;
+      padding: 8px 12px;
       font-weight: bold;
       color: var(--accent-color);
-      white-space: nowrap;
-      min-width: 120px;
+      flex: 1;
+      max-width: 180px;
     }
 
     .total-score-box {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       font-weight: 800;
-      white-space: nowrap;
-      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 10px;
+    }
+
+    @media (min-width: 600px) {
+      .total-score-box {
+        width: auto;
+        border-top: none;
+        padding-top: 0;
+        justify-content: flex-end;
+      }
     }
 
     .total-score {
       color: var(--highlight);
-      font-size: 2.2rem;
+      font-size: 1.8rem;
       margin-left: 8px;
     }
 
-    /* 경기 카드 레이아웃 */
+    /* 경기 카드 레이아웃 컨테이너 */
     .matches-layout {
       display: flex;
       flex-direction: column;
-      gap: 20px;
-    }
-
-    .row-grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
     }
 
-    .row-grid-3 {
+    /* 행 그리드 (모바일 반응형) */
+    .row-grid-4, .row-grid-3 {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      grid-template-columns: 1fr;
+      gap: 14px;
     }
 
-    @media (max-width: 900px) {
+    @media (min-width: 500px) {
       .row-grid-4, .row-grid-3 {
         grid-template-columns: repeat(2, 1fr);
       }
     }
 
-    @media (max-width: 550px) {
-      .row-grid-4, .row-grid-3 {
-        grid-template-columns: 1fr;
+    @media (min-width: 900px) {
+      .row-grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .row-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
       }
     }
 
+    /* 경기 카드 스타일 (모바일 텍스트 처리) */
     .match-card {
       background-color: var(--card-inner);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
+      overflow: hidden;
+      width: 100%;
     }
 
     .match-header {
       border-bottom: 1px dashed var(--border-color);
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       text-align: center;
     }
 
     .match-title {
       font-weight: 800;
       color: var(--accent-color);
-      font-size: 1rem;
-      margin-bottom: 4px;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
     }
 
     .match-score {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
 
     .match-score span {
       color: var(--highlight);
       font-weight: bold;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
 
     .player-select-group-col {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .select-box {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
+      width: 100%;
     }
 
     .select-box label {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       font-weight: 600;
     }
 
+    /* 드롭다운 옵션 텍스트 모바일 자르기/생략 처리 */
     select {
       background-color: var(--bg-color);
       color: var(--text-color);
       border: 1px solid var(--border-color);
-      padding: 8px 10px;
+      padding: 8px;
       border-radius: 6px;
       outline: none;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
       width: 100%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     select:focus {
       border-color: var(--accent-color);
+    }
+
+    select option {
+      font-size: 0.82rem;
     }
 
     select option:disabled {
@@ -339,11 +400,12 @@
         <div class="team-select-box">
           <label for="teamSelect">팀 선택:</label>
           <select id="teamSelect" onchange="onTeamChange()">
-            <!-- JS로 동적 생성 -->
+            <!-- JS 동적 생성 -->
           </select>
         </div>
         <div class="total-score-box">
-          총 점수: <span id="totalScore" class="total-score">0</span> 점
+          <span>총 점수</span>
+          <div><span id="totalScore" class="total-score">0</span> 점</div>
         </div>
       </div>
 
@@ -544,14 +606,11 @@
       calculateTotal();
     }
 
-    // [수정 2] 동일 경기 내 중복선택 금지 + 전체 최대 2회 제한 검사
+    // 동일 경기 내 중복선택 금지 + 전체 최대 2회 제한 검사
     function updatePlayerSelectOptions() {
       const allSelects = document.querySelectorAll('.match-player-select');
       
-      // 전체 선택 횟수 카운트
       const totalSelectedCounts = {};
-      
-      // 각 경기별로 선택된 선수들의 집합 (동일 경기 중복 검사용)
       const matchSelectedPlayers = {};
 
       allSelects.forEach(select => {
@@ -568,7 +627,6 @@
         }
       });
 
-      // 옵션 활성/비활성화 처리
       allSelects.forEach(select => {
         const matchId = select.getAttribute('data-match');
         const currentValue = select.value;
@@ -580,22 +638,18 @@
           const totalCount = totalSelectedCounts[playerName] || 0;
           const isSelectedInSameMatch = matchSelectedPlayers[matchId].has(playerName);
 
-          // 현재 내 드롭다운에서 선택되어 있는 선수인 경우 항상 활성화
           if (playerName === currentValue) {
             option.disabled = false;
             option.text = `${playerName} (${getPlayerInfoText(playerName)})`;
           } 
-          // [수정 2-1] 같은 경기 안에서 다른 드롭다운에 이미 선택된 경우
           else if (isSelectedInSameMatch) {
             option.disabled = true;
             option.text = `${playerName} (동일 경기 선택됨)`;
           } 
-          // [수정 2-2] 다른 경기 포함 전체 2회 이상 선택된 경우
           else if (totalCount >= 2) {
             option.disabled = true;
             option.text = `${playerName} (2회 선택 완료)`;
           } 
-          // 선택 가능
           else {
             option.disabled = false;
             option.text = `${playerName} (${getPlayerInfoText(playerName)})`;
