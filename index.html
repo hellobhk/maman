@@ -179,11 +179,46 @@
     }
     .schedule-item.active .toggle-icon { transform: rotate(180deg); }
 
-    .schedule-detail { display: none; padding: 12px; border-top: 1px dashed var(--border-color); background-color: var(--bg-color); }
+    /* 상세 경기 테이블 모바일 대응 스타일 수정 */
+    .schedule-detail { display: none; padding: 8px 4px; border-top: 1px dashed var(--border-color); background-color: var(--bg-color); }
     .schedule-item.active .schedule-detail { display: block; }
-    .detail-match-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-    .detail-match-table th, .detail-match-table td { padding: 6px 2px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-    .detail-match-table th { color: var(--text-muted); font-size: 0.75rem; }
+    
+    .detail-match-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; table-layout: auto; }
+    .detail-match-table th, .detail-match-table td { padding: 5px 2px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); vertical-align: middle; }
+    .detail-match-table th { color: var(--text-muted); font-size: 0.72rem; }
+
+    /* 1. 경기명 괄호 하단 배치 처리 */
+    .detail-match-table td.match-title {
+      text-align: left;
+      font-weight: bold;
+      color: var(--accent-color);
+      white-space: normal;
+      line-height: 1.25;
+      padding-left: 2px;
+    }
+    .detail-match-table td.match-title span.match-sub {
+      display: block;
+      font-weight: normal;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    /* 2. 출전 선수 이름 줄바꿈 단어 중간 잘림 방지 */
+    .detail-match-table td.players-cell {
+      word-break: keep-all;
+      word-wrap: break-word;
+      line-height: 1.3;
+      padding: 4px 2px;
+    }
+
+    /* 3. 스코어(결과) 줄바꿈 절대 방지 */
+    .detail-match-table td.score-cell {
+      font-weight: bold;
+      white-space: nowrap !important;
+      padding: 4px 2px;
+    }
+
     .winner-pts { color: var(--win-color); font-weight: bold; }
 
     .standings-card { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; }
@@ -409,6 +444,16 @@
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     }
 
+    /* 1. 경기 텍스트 분리 함수 (괄호 내용을 아래 줄로 배치) */
+    function formatMatchTitle(matchName) {
+      if (!matchName) return '';
+      const match = matchName.match(/^(.*?)\s*(\(.*?\))$/);
+      if (match) {
+        return `${match[1]} <span class="match-sub">${match[2]}</span>`;
+      }
+      return matchName;
+    }
+
     function renderScheduleAndStandings() {
       renderScheduleList();
       renderStandings();
@@ -448,13 +493,13 @@
 
         const detailRows = details.map(d => `
           <tr>
-            <td style="text-align:left; font-weight:bold; color:var(--accent-color);">${d.matchName}</td>
-            <td>${(d.playersA || []).join(', ')}</td>
-            <td style="font-weight:bold;">
+            <td class="match-title">${formatMatchTitle(d.matchName)}</td>
+            <td class="players-cell">${(d.playersA || []).join(', ')}</td>
+            <td class="score-cell">
               <span class="${d.winA ? 'winner-pts' : ''}">${d.winA || 0}</span> : 
               <span class="${d.winB ? 'winner-pts' : ''}">${d.winB || 0}</span>
             </td>
-            <td>${(d.playersB || []).join(', ')}</td>
+            <td class="players-cell">${(d.playersB || []).join(', ')}</td>
           </tr>
         `).join('');
 
@@ -483,9 +528,9 @@
               <table class="detail-match-table">
                 <thead>
                   <tr>
-                    <th style="text-align:left;">경기</th>
+                    <th style="text-align:left; padding-left:2px;">경기</th>
                     <th>${item.teamA} 출전</th>
-                    <th>결과</th>
+                    <th style="white-space:nowrap;">결과</th>
                     <th>${item.teamB} 출전</th>
                   </tr>
                 </thead>
