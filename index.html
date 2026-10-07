@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>7336 프로리그 참가인원 점수 계산기</title>
+  <title>제2회 7336 프로리그</title>
   <style>
     :root {
       --bg-color: #0b0f19;
@@ -15,412 +15,156 @@
       --text-muted: #94a3b8;
       --border-color: #2e3d5e;
       --highlight: #f59e0b;
+
+      /* 변경된 팀 시그니처 컬러 */
+      --color-sinbi: #3b82f6;   /* 신비 (파란색 톤) */
+      --color-deodeum: #eab308; /* 더듬 (노란색 톤) */
+      --color-hayden: #ef4444;  /* 헤이든 (붉은색 톤) */
+      --color-mitto: #ec4899;   /* 미또 (마젠타 톤) */
+
+      --win-color: #10b981;
+      --loss-color: #ef4444;
+      --draw-color: #94a3b8;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); padding: 16px 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .container { width: 100%; max-width: 1200px; }
+    
+    h1 { text-align: center; margin-bottom: 20px; font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-shadow: 0 0 15px var(--accent-glow); letter-spacing: -0.5px; word-break: keep-all; }
+    @media (min-width: 768px) { h1 { font-size: 2.2rem; margin-bottom: 24px; } body { padding: 24px; } }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      padding: 16px 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
+    .tab-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; width: 100%; }
+    .tab-btn { flex: 1; max-width: 220px; padding: 12px 16px; font-size: 0.95rem; font-weight: 700; border: 2px solid var(--accent-color); background-color: transparent; color: var(--accent-color); border-radius: 10px; cursor: pointer; transition: all 0.25s ease; text-align: center; white-space: nowrap; }
+    .tab-btn.active, .tab-btn:hover { background-color: var(--accent-color); color: #0b0f19; box-shadow: 0 0 15px var(--accent-glow); }
 
-    .container {
-      width: 100%;
-      max-width: 1200px;
-    }
+    .tab-content { display: none; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6); }
+    @media (min-width: 768px) { .tab-content { padding: 24px; } }
+    .tab-content.active { display: block; }
 
-    /* 최상단 제목 (모바일 대응) */
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--accent-color);
-      text-shadow: 0 0 15px var(--accent-glow);
-      letter-spacing: -0.5px;
-      word-break: keep-all;
-    }
+    /* 팀별 인원 보기 */
+    .team-grid-4 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 600px) { .team-grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .team-grid-4 { grid-template-columns: repeat(4, 1fr); } }
 
-    @media (min-width: 768px) {
-      h1 {
-        font-size: 2.2rem;
-        margin-bottom: 24px;
-      }
-      body {
-        padding: 24px;
-      }
-    }
+    .team-card { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; overflow: hidden; }
+    .team-card h3 { border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px; font-size: 1.15rem; text-align: center; font-weight: 800; }
 
-    /* 상단 버튼 */
-    .tab-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      width: 100%;
-    }
+    .team-sinbi { color: var(--color-sinbi) !important; }
+    .team-deodeum { color: var(--color-deodeum) !important; }
+    .team-hayden { color: var(--color-hayden) !important; }
+    .team-mitto { color: var(--color-mitto) !important; }
 
-    .tab-btn {
-      flex: 1;
-      max-width: 200px;
-      padding: 12px 16px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      border: 2px solid var(--accent-color);
-      background-color: transparent;
-      color: var(--accent-color);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      text-align: center;
-      white-space: nowrap;
-    }
+    .member-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed; }
+    .member-table th, .member-table td { padding: 6px 2px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .member-table th { color: var(--text-muted); font-weight: 600; }
+    .member-table td.name { font-weight: 600; }
+    .member-table td.score { color: var(--highlight); font-weight: 700; }
 
-    .tab-btn.active, .tab-btn:hover {
-      background-color: var(--accent-color);
-      color: #0b0f19;
-      box-shadow: 0 0 15px var(--accent-glow);
-    }
+    /* 일정 및 순위 */
+    .schedule-standings-container { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 900px) { .schedule-standings-container { grid-template-columns: 1.2fr 0.8fr; } }
 
-    /* 탭 메인 컨테이너 */
-    .tab-content {
-      display: none;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    .section-title { font-size: 1.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+    .schedule-list { display: flex; flex-direction: column; gap: 12px; }
+    .schedule-item { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: all 0.2s ease; }
+    
+    /* 지난/완료된 경기 스타일 (어두운 톤) */
+    .schedule-item.completed {
+      background-color: #111726;
+      border-color: #1e293b;
+      opacity: 0.65;
     }
-
-    @media (min-width: 768px) {
-      .tab-content {
-        padding: 24px;
-      }
+    .schedule-item.completed:hover {
+      opacity: 0.85;
     }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* 팀별 인원 보기 카드 그리드 */
-    .team-grid-4 {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    @media (min-width: 600px) {
-      .team-grid-4 {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .team-grid-4 {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .team-card {
-      background-color: var(--card-inner);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .team-card h3 {
-      color: var(--accent-color);
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 8px;
-      margin-bottom: 10px;
-      font-size: 1.15rem;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    .member-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      table-layout: fixed;
-    }
-
-    .member-table th, .member-table td {
-      padding: 6px 2px;
-      text-align: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .member-table th {
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .member-table td.name {
-      font-weight: 600;
-    }
-
-    .member-table td.grade {
-      color: var(--accent-color);
-    }
-
-    .member-table td.score {
-      color: var(--highlight);
-      font-weight: 700;
-    }
-
-    /* 계산기 헤더 (모바일 분리 및 정렬) */
-    .calc-header {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background-color: var(--card-inner);
-      padding: 14px 16px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      border: 1px solid var(--border-color);
-    }
-
-    @media (min-width: 600px) {
-      .calc-header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        padding: 18px 24px;
-      }
-    }
-
-    .team-select-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1rem;
-      font-weight: 700;
-      width: 100%;
-    }
-
-    @media (min-width: 600px) {
-      .team-select-box {
-        width: auto;
-      }
-    }
-
-    .team-select-box label {
-      white-space: nowrap;
-      word-break: keep-all;
-      flex-shrink: 0;
-    }
-
-    .team-select-box select {
-      font-size: 0.95rem;
-      padding: 8px 12px;
+    .status-badge {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
       font-weight: bold;
-      color: var(--accent-color);
-      flex: 1;
-      max-width: 180px;
+      margin-left: 6px;
     }
+    .badge-completed { background-color: #334155; color: #94a3b8; }
+    .badge-upcoming { background-color: #0284c7; color: #ffffff; }
 
-    .total-score-box {
-      font-size: 1.1rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      border-top: 1px dashed var(--border-color);
-      padding-top: 10px;
-    }
+    .schedule-header { padding: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background-color: rgba(255, 255, 255, 0.02); transition: background-color 0.2s ease; }
+    .schedule-header:hover { background-color: rgba(255, 255, 255, 0.05); }
+    .schedule-info { display: flex; flex-direction: column; gap: 4px; }
+    .schedule-date { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; }
+    .schedule-teams { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .schedule-score { font-size: 1.15rem; font-weight: 800; color: var(--highlight); padding: 4px 10px; background-color: var(--bg-color); border-radius: 6px; border: 1px solid var(--border-color); }
+    .toggle-icon { font-size: 0.8rem; color: var(--text-muted); margin-left: 8px; transition: transform 0.25s ease; }
+    .schedule-item.active .toggle-icon { transform: rotate(180deg); }
 
-    @media (min-width: 600px) {
-      .total-score-box {
-        width: auto;
-        border-top: none;
-        padding-top: 0;
-        justify-content: flex-end;
-      }
-    }
+    .schedule-detail { display: none; padding: 14px; border-top: 1px dashed var(--border-color); background-color: var(--bg-color); }
+    .schedule-item.active .schedule-detail { display: block; }
+    .detail-match-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .detail-match-table th, .detail-match-table td { padding: 8px 4px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .detail-match-table th { color: var(--text-muted); font-size: 0.78rem; }
+    .winner-pts { color: var(--win-color); font-weight: bold; }
 
-    .total-score {
-      color: var(--highlight);
-      font-size: 1.8rem;
-      margin-left: 8px;
-    }
-
-    /* 경기 카드 레이아웃 컨테이너 */
-    .matches-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* 행 그리드 (모바일 반응형) */
-    .row-grid-4, .row-grid-3 {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-
-    @media (min-width: 500px) {
-      .row-grid-4, .row-grid-3 {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 900px) {
-      .row-grid-4 {
-        grid-template-columns: repeat(4, 1fr);
-      }
-      .row-grid-3 {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    /* 경기 카드 스타일 (모바일 텍스트 처리) */
-    .match-card {
-      background-color: var(--card-inner);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      overflow: hidden;
-      width: 100%;
-    }
-
-    .match-header {
-      border-bottom: 1px dashed var(--border-color);
-      padding-bottom: 8px;
-      text-align: center;
-    }
-
-    .match-title {
-      font-weight: 800;
-      color: var(--accent-color);
-      font-size: 0.95rem;
-      margin-bottom: 2px;
-    }
-
-    .match-score {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .match-score span {
-      color: var(--highlight);
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    .player-select-group-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .select-box {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      width: 100%;
-    }
-
-    .select-box label {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    /* 드롭다운 옵션 텍스트 모바일 자르기/생략 처리 */
-    select {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-      padding: 8px;
-      border-radius: 6px;
-      outline: none;
-      font-size: 0.82rem;
-      cursor: pointer;
-      width: 100%;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    select:focus {
-      border-color: var(--accent-color);
-    }
-
-    select option {
-      font-size: 0.82rem;
-    }
-
-    select option:disabled {
-      color: #64748b;
-      background-color: #0f172a;
-    }
+    .standings-card { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; }
+    .standings-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .standings-table th, .standings-table td { padding: 10px 4px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .standings-table th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; }
+    .rank-num { font-weight: bold; color: var(--accent-color); }
+    .pts-num { color: var(--highlight); font-weight: bold; font-size: 1rem; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- 최상단 제목 -->
-    <h1>7336 프로리그 참가인원 점수 계산기</h1>
+    <h1>제2회 7336 프로리그</h1>
 
-    <!-- 상단 버튼 -->
     <div class="tab-buttons">
-      <button class="tab-btn active" onclick="switchTab('teamTab', this)">팀별 인원 보기</button>
-      <button class="tab-btn" onclick="switchTab('calcTab', this)">점수 계산기</button>
+      <button class="tab-btn active" onclick="switchTab('scheduleTab', this)">일정 및 순위</button>
+      <button class="tab-btn" onclick="switchTab('teamTab', this)">팀별 인원 보기</button>
     </div>
 
-    <!-- 첫 번째 버튼: 팀별 인원 보기 -->
-    <div id="teamTab" class="tab-content active">
+    <!-- 1. 일정 및 순위 (기본 활성화) -->
+    <div id="scheduleTab" class="tab-content active">
+      <div class="schedule-standings-container">
+        <div>
+          <div class="section-title">
+            <span>경기 일정 및 결과</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(최신순 실시간)</span>
+          </div>
+          <div id="scheduleList" class="schedule-list"></div>
+        </div>
+
+        <div>
+          <div class="section-title">팀 순위표</div>
+          <div class="standings-card">
+            <table class="standings-table">
+              <thead>
+                <tr>
+                  <th>순위</th>
+                  <th>팀명</th>
+                  <th>경기</th>
+                  <th>승/무/패</th>
+                  <th>단판승합</th>
+                  <th>승점</th>
+                </tr>
+              </thead>
+              <tbody id="standingsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 팀별 인원 보기 -->
+    <div id="teamTab" class="tab-content">
       <div id="teamGrid" class="team-grid-4"></div>
-    </div>
-
-    <!-- 두 번째 버튼: 점수 계산기 -->
-    <div id="calcTab" class="tab-content">
-      <div class="calc-header">
-        <div class="team-select-box">
-          <label for="teamSelect">팀 선택:</label>
-          <select id="teamSelect" onchange="onTeamChange()">
-            <!-- JS 동적 생성 -->
-          </select>
-        </div>
-        <div class="total-score-box">
-          <span>총 점수</span>
-          <div><span id="totalScore" class="total-score">0</span> 점</div>
-        </div>
-      </div>
-
-      <!-- 경기 레이아웃 (행 구분) -->
-      <div class="matches-layout">
-        <div id="row1Container" class="row-grid-4"></div>
-        <div id="row2Container" class="row-grid-3"></div>
-      </div>
     </div>
   </div>
 
   <script>
-    // 명단 데이터
+    // 구글 Apps Script 웹 앱 URL
+    const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwA2jQmq7vsXyd6Mk5ABT27fjgWneVPjTXavW5Ivav6rNGM1nLnPLEIVeNL97S8o0a5/exec";
+
     const playersData = [
-      // 더듬 팀
       { name: "엠비", grade: "SC", score: 7, team: "더듬" },
       { name: "케이", grade: "SC", score: 7, team: "더듬" },
       { name: "루시퍼", grade: "SC", score: 7, team: "더듬" },
@@ -437,7 +181,6 @@
       { name: "롱", grade: "C", score: 2, team: "더듬" },
       { name: "핑쿠짱", grade: "D", score: 1, team: "더듬" },
 
-      // 미또 팀
       { name: "로까", grade: "SC", score: 7, team: "미또" },
       { name: "341", grade: "SC", score: 7, team: "미또" },
       { name: "미또", grade: "SC", score: 7, team: "미또" },
@@ -454,7 +197,6 @@
       { name: "파이어", grade: "B", score: 3, team: "미또" },
       { name: "팔구", grade: "D", score: 1, team: "미또" },
 
-      // 신비 팀
       { name: "영차", grade: "SA", score: 9, team: "신비" },
       { name: "비트", grade: "SC", score: 7, team: "신비" },
       { name: "이천", grade: "SC", score: 7, team: "신비" },
@@ -472,7 +214,6 @@
       { name: "수고", grade: "C", score: 2, team: "신비" },
       { name: "조아", grade: "C", score: 2, team: "신비" },
 
-      // 헤이든 팀
       { name: "순삼", grade: "SB", score: 8, team: "헤이든" },
       { name: "로이", grade: "SC", score: 7, team: "헤이든" },
       { name: "스타돗", grade: "SD", score: 6, team: "헤이든" },
@@ -490,37 +231,32 @@
       { name: "최", grade: "B", score: 3, team: "헤이든" }
     ];
 
-    const row1Configs = [
-      { id: 1, name: "경기 1 (2대2)", count: 2 },
-      { id: 2, name: "경기 2 (2대2)", count: 2 },
-      { id: 3, name: "경기 3 (3대3)", count: 3 },
-      { id: 4, name: "경기 4 (3대3)", count: 3 }
-    ];
+    const targetTeams = ["신비", "더듬", "헤이든", "미또"];
+    let matchSchedules = [];
 
-    const row2Configs = [
-      { id: 5, name: "경기 5 (4대4)", count: 4 },
-      { id: 6, name: "경기 6 (4대4)", count: 4 },
-      { id: 7, name: "경기 7 (1대1)", count: 1 }
-    ];
+    function getTeamColorClass(teamName) {
+      switch(teamName) {
+        case "신비": return "team-sinbi";
+        case "더듬": return "team-deodeum";
+        case "헤이든": return "team-hayden";
+        case "미또": return "team-mitto";
+        default: return "";
+      }
+    }
 
-    const allConfigs = [...row1Configs, ...row2Configs];
-    const targetTeams = ["신비", "헤이든", "더듬", "미또"];
-
-    // 탭 전환
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      
       document.getElementById(tabId).classList.add('active');
       btn.classList.add('active');
     }
 
-    // 팀별 인원 보기
     function renderTeamView() {
       const teamGrid = document.getElementById('teamGrid');
-
       teamGrid.innerHTML = targetTeams.map(teamName => {
         const teamPlayers = playersData.filter(p => p.team === teamName);
+        const colorClass = getTeamColorClass(teamName);
+
         const rows = teamPlayers.map(p => `
           <tr>
             <td class="name">${p.name}</td>
@@ -531,15 +267,9 @@
 
         return `
           <div class="team-card">
-            <h3>${teamName} (${teamPlayers.length}명)</h3>
+            <h3 class="${colorClass}">${teamName} (${teamPlayers.length}명)</h3>
             <table class="member-table">
-              <thead>
-                <tr>
-                  <th>이름</th>
-                  <th>등급</th>
-                  <th>점수</th>
-                </tr>
-              </thead>
+              <thead><tr><th>이름</th><th>등급</th><th>점수</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
@@ -547,162 +277,190 @@
       }).join('');
     }
 
-    // 계산기 초기화
-    function initCalculator() {
-      const teamSelect = document.getElementById('teamSelect');
-      teamSelect.innerHTML = targetTeams.map(t => `<option value="${t}">${t} 팀</option>`).join('');
-
-      renderMatches();
-      updatePlayerSelectOptions();
-      calculateTotal();
-    }
-
-    // 경기 카드 HTML 생성
-    function createMatchCardHTML(m, teamPlayers) {
-      let selects = '';
-      for (let i = 1; i <= m.count; i++) {
-        const options = teamPlayers.map(p => 
-          `<option value="${p.name}" data-score="${p.score}">${p.name} (${p.grade} / ${p.score}점)</option>`
-        ).join('');
-
-        selects += `
-          <div class="select-box">
-            <label>선수 ${i}</label>
-            <select class="match-player-select" data-match="${m.id}" onchange="onPlayerSelectChange()">
-              <option value="">-- 선택 --</option>
-              ${options}
-            </select>
-          </div>
-        `;
+    // 구글 시트 데이터 로드
+    async function loadSchedulesFromGoogleSheet() {
+      const scheduleContainer = document.getElementById('scheduleList');
+      if (scheduleContainer) {
+        scheduleContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">구글 시트에서 데이터를 불러오는 중...</div>';
       }
 
-      return `
-        <div class="match-card">
-          <div class="match-header">
-            <div class="match-title">${m.name}</div>
-            <div class="match-score">소계: <span id="match-score-${m.id}">0</span>점</div>
-          </div>
-          <div class="player-select-group-col">
-            ${selects}
-          </div>
-        </div>
-      `;
+      try {
+        const response = await fetch(GOOGLE_SHEET_API_URL);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          matchSchedules = data;
+        }
+        renderScheduleAndStandings();
+      } catch (error) {
+        console.error("구글 시트 연동 실패:", error);
+        if (scheduleContainer) {
+          scheduleContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--loss-color);">구글 시트 데이터를 가져오지 못했습니다.</div>';
+        }
+      }
     }
 
-    // 행별로 나누어 렌더링
-    function renderMatches() {
-      const row1Container = document.getElementById('row1Container');
-      const row2Container = document.getElementById('row2Container');
-      const selectedTeam = document.getElementById('teamSelect').value;
-      const teamPlayers = playersData.filter(p => p.team === selectedTeam);
-
-      row1Container.innerHTML = row1Configs.map(m => createMatchCardHTML(m, teamPlayers)).join('');
-      row2Container.innerHTML = row2Configs.map(m => createMatchCardHTML(m, teamPlayers)).join('');
-    }
-
-    // 선수 선택 변경 시
-    function onPlayerSelectChange() {
-      updatePlayerSelectOptions();
-      calculateTotal();
-    }
-
-    // 동일 경기 내 중복선택 금지 + 전체 최대 2회 제한 검사
-    function updatePlayerSelectOptions() {
-      const allSelects = document.querySelectorAll('.match-player-select');
+    // ISO 날짜 문자열을 'YYYY-MM-DD HH:mm' 포맷으로 변경
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
       
-      const totalSelectedCounts = {};
-      const matchSelectedPlayers = {};
+      if (typeof dateStr === 'string' && !dateStr.includes('T')) {
+        return dateStr;
+      }
 
-      allSelects.forEach(select => {
-        const matchId = select.getAttribute('data-match');
-        const val = select.value;
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
 
-        if (!matchSelectedPlayers[matchId]) {
-          matchSelectedPlayers[matchId] = new Set();
-        }
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const hours = String(d.getHours()).padStart(2, '0');
+      const minutes = String(d.getMinutes()).padStart(2, '0');
 
-        if (val) {
-          totalSelectedCounts[val] = (totalSelectedCounts[val] || 0) + 1;
-          matchSelectedPlayers[matchId].add(val);
-        }
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+
+    function renderScheduleAndStandings() {
+      renderScheduleList();
+      renderStandings();
+    }
+
+    function renderScheduleList() {
+      const scheduleContainer = document.getElementById('scheduleList');
+      if (!matchSchedules || matchSchedules.length === 0) {
+        scheduleContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">등록된 경기 일정이 없습니다.</div>';
+        return;
+      }
+
+      // 최신 경기 날짜 순 정렬 (내림차순)
+      const sortedSchedules = [...matchSchedules].sort((a, b) => new Date(b.date) - new Date(a.date));
+      const now = new Date();
+
+      scheduleContainer.innerHTML = sortedSchedules.map(item => {
+        const classA = getTeamColorClass(item.teamA);
+        const classB = getTeamColorClass(item.teamB);
+        const formattedDate = formatDate(item.date);
+        
+        // 경기 진행 여부 판단 (세부 매치 중 1점 이상 입력이 있거나, 날짜가 지난 경우)
+        const details = item.details || [];
+        const hasScore = details.some(d => Number(d.winA || 0) > 0 || Number(d.winB || 0) > 0);
+        const isPastDate = new Date(item.date) < now;
+        const isCompleted = hasScore || isPastDate;
+
+        const detailRows = details.map(d => `
+          <tr>
+            <td style="text-align:left; font-weight:bold; color:var(--accent-color);">${d.matchName}</td>
+            <td>${(d.playersA || []).join(', ')}</td>
+            <td style="font-weight:bold;">
+              <span class="${d.winA ? 'winner-pts' : ''}">${d.winA || 0}점</span> : 
+              <span class="${d.winB ? 'winner-pts' : ''}">${d.winB || 0}점</span>
+            </td>
+            <td>${(d.playersB || []).join(', ')}</td>
+          </tr>
+        `).join('');
+
+        return `
+          <div class="schedule-item ${isCompleted ? 'completed' : ''}" id="schedule-${item.id}">
+            <div class="schedule-header" onclick="toggleScheduleDetail('${item.id}')">
+              <div class="schedule-info">
+                <span class="schedule-date">
+                  ${formattedDate}
+                  <span class="status-badge ${isCompleted ? 'badge-completed' : 'badge-upcoming'}">
+                    ${isCompleted ? '완료' : '예정'}
+                  </span>
+                </span>
+                <div class="schedule-teams">
+                  <span class="${classA}">${item.teamA}</span>
+                  <span style="color:var(--text-muted); font-size:0.8rem;">vs</span>
+                  <span class="${classB}">${item.teamB}</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center;">
+                <div class="schedule-score">${item.scoreA} : ${item.scoreB}</div>
+                <span class="toggle-icon">▼</span>
+              </div>
+            </div>
+            <div class="schedule-detail">
+              <table class="detail-match-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;">경기</th>
+                    <th>${item.teamA} 출전</th>
+                    <th>결과 (단판 1점)</th>
+                    <th>${item.teamB} 출전</th>
+                  </tr>
+                </thead>
+                <tbody>${detailRows}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleScheduleDetail(id) {
+      const elem = document.getElementById(`schedule-${id}`);
+      if (elem) elem.classList.toggle('active');
+    }
+
+    function renderStandings() {
+      const standingsBody = document.getElementById('standingsBody');
+      const teamStats = {};
+      targetTeams.forEach(t => {
+        teamStats[t] = { team: t, played: 0, win: 0, draw: 0, loss: 0, totalIndividualWins: 0, pts: 0 };
       });
 
-      allSelects.forEach(select => {
-        const matchId = select.getAttribute('data-match');
-        const currentValue = select.value;
+      (matchSchedules || []).forEach(m => {
+        const tA = teamStats[m.teamA];
+        const tB = teamStats[m.teamB];
 
-        Array.from(select.options).forEach(option => {
-          const playerName = option.value;
-          if (!playerName) return;
+        if (tA && tB) {
+          const details = m.details || [];
+          const isPlayed = details.some(d => Number(d.winA || 0) > 0 || Number(d.winB || 0) > 0);
 
-          const totalCount = totalSelectedCounts[playerName] || 0;
-          const isSelectedInSameMatch = matchSelectedPlayers[matchId].has(playerName);
+          if (isPlayed) {
+            tA.played += 1;
+            tB.played += 1;
 
-          if (playerName === currentValue) {
-            option.disabled = false;
-            option.text = `${playerName} (${getPlayerInfoText(playerName)})`;
-          } 
-          else if (isSelectedInSameMatch) {
-            option.disabled = true;
-            option.text = `${playerName} (동일 경기 선택됨)`;
-          } 
-          else if (totalCount >= 2) {
-            option.disabled = true;
-            option.text = `${playerName} (2회 선택 완료)`;
-          } 
-          else {
-            option.disabled = false;
-            option.text = `${playerName} (${getPlayerInfoText(playerName)})`;
-          }
-        });
-      });
-    }
+            tA.totalIndividualWins += Number(m.scoreA || 0);
+            tB.totalIndividualWins += Number(m.scoreB || 0);
 
-    // 선수 정보 텍스트 추출
-    function getPlayerInfoText(playerName) {
-      const player = playersData.find(p => p.name === playerName);
-      return player ? `${player.grade} / ${player.score}점` : '';
-    }
-
-    // 팀 선택 변경 시
-    function onTeamChange() {
-      renderMatches();
-      updatePlayerSelectOptions();
-      calculateTotal();
-    }
-
-    // 점수 자동 합산
-    function calculateTotal() {
-      let grandTotal = 0;
-
-      allConfigs.forEach(m => {
-        const selects = document.querySelectorAll(`.match-player-select[data-match="${m.id}"]`);
-        let matchSum = 0;
-
-        selects.forEach(s => {
-          const selectedName = s.value;
-          if (selectedName) {
-            const player = playersData.find(p => p.name === selectedName);
-            if (player) {
-              matchSum += player.score;
+            if (Number(m.scoreA) > Number(m.scoreB)) {
+              tA.win += 1; tA.pts += 3; tB.loss += 1;
+            } else if (Number(m.scoreB) > Number(m.scoreA)) {
+              tB.win += 1; tB.pts += 3; tA.loss += 1;
+            } else {
+              tA.draw += 1; tA.pts += 1; tB.draw += 1; tB.pts += 1;
             }
           }
-        });
-
-        const scoreElem = document.getElementById(`match-score-${m.id}`);
-        if (scoreElem) {
-          scoreElem.innerText = matchSum;
         }
-        grandTotal += matchSum;
       });
 
-      document.getElementById('totalScore').innerText = grandTotal;
+      const sortedTeams = Object.values(teamStats).sort((a, b) => {
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        return b.totalIndividualWins - a.totalIndividualWins;
+      });
+
+      standingsBody.innerHTML = sortedTeams.map((t, idx) => {
+        const colorClass = getTeamColorClass(t.team);
+        const ptsDisplay = t.pts > 0 ? `+${t.pts}` : `${t.pts}`;
+
+        return `
+          <tr>
+            <td class="rank-num">${idx + 1}</td>
+            <td class="${colorClass}" style="font-weight:bold;">${t.team}</td>
+            <td>${t.played}</td>
+            <td>${t.win}/${t.draw}/${t.loss}</td>
+            <td style="font-weight:bold;">${t.totalIndividualWins}점</td>
+            <td class="pts-num">${ptsDisplay}</td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    // 초기 로드
     window.onload = () => {
       renderTeamView();
-      initCalculator();
+      loadSchedulesFromGoogleSheet();
     };
   </script>
 </body>
