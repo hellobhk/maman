@@ -34,9 +34,25 @@
     h1 { text-align: center; margin-bottom: 16px; font-size: 1.35rem; font-weight: 800; color: var(--accent-color); text-shadow: 0 0 15px var(--accent-glow); letter-spacing: -0.5px; word-break: keep-all; }
     @media (min-width: 768px) { h1 { font-size: 2.2rem; margin-bottom: 24px; } body { padding: 24px; } }
 
-    .tab-buttons { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; width: 100%; }
+    .tab-buttons { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; width: 100%; }
     .tab-btn { flex: 1; max-width: 220px; padding: 10px 12px; font-size: 0.9rem; font-weight: 700; border: 2px solid var(--accent-color); background-color: transparent; color: var(--accent-color); border-radius: 10px; cursor: pointer; transition: all 0.25s ease; text-align: center; white-space: nowrap; }
     .tab-btn.active, .tab-btn:hover { background-color: var(--accent-color); color: #0b0f19; box-shadow: 0 0 15px var(--accent-glow); }
+
+    /* 계좌 안내 문구 스타일 (항상 2줄 표시) */
+    .sponsor-info {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+    .sponsor-info span {
+      display: block; /* 두 줄로 나누기 처리 */
+    }
+    .sponsor-info span:first-child {
+      margin-bottom: 4px; /* 줄 간격 지정 */
+    }
 
     .tab-content { display: none; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 12px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6); }
     @media (min-width: 768px) { .tab-content { padding: 24px; } }
@@ -95,7 +111,6 @@
     .badge-completed { background-color: #334155; color: #94a3b8; }
     .badge-upcoming { background-color: #0284c7; color: #ffffff; }
 
-    /* 모바일 줄바꿈 방지 수정 영역 */
     .schedule-header { 
       padding: 10px 12px; 
       display: flex; 
@@ -112,7 +127,7 @@
       display: flex; 
       flex-direction: column; 
       gap: 3px; 
-      min-width: 0; /* flex 자식이 overflow 시 축소 가능하도록 적용 */
+      min-width: 0;
       flex: 1;
     }
     .schedule-date { 
@@ -142,7 +157,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      flex-shrink: 0; /* 줄바꿈 방지: 크기 고정 */
+      flex-shrink: 0;
     }
 
     .schedule-score { 
@@ -184,9 +199,16 @@
   <div class="container">
     <h1>제2회 7336 프로리그</h1>
 
+    <!-- 탭 버튼 -->
     <div class="tab-buttons">
       <button class="tab-btn active" onclick="switchTab('scheduleTab', this)">일정 및 순위</button>
       <button class="tab-btn" onclick="switchTab('teamTab', this)">팀별 인원 보기</button>
+    </div>
+
+    <!-- 버튼과 페이지 영역 사이의 두 줄 안내 텍스트 -->
+    <div class="sponsor-info">
+      <span>찬조금 후원 계좌 : 기업 68202508701039 이소영</span>
+      <span>마맨 커피값 계좌 : 국민 04390204165650 배효관</span>
     </div>
 
     <!-- 1. 일정 및 순위 (기본 활성화) -->
@@ -401,7 +423,6 @@
 
       const now = new Date();
 
-      // 날짜 정렬 조건 적용
       const sortedSchedules = [...matchSchedules].sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
