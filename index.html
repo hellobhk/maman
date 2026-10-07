@@ -179,7 +179,7 @@
     }
     .schedule-item.active .toggle-icon { transform: rotate(180deg); }
 
-    /* 상세 경기 테이블 모바일 대응 스타일 수정 */
+    /* 상세 경기 테이블 모바일 대응 스타일 */
     .schedule-detail { display: none; padding: 8px 4px; border-top: 1px dashed var(--border-color); background-color: var(--bg-color); }
     .schedule-item.active .schedule-detail { display: block; }
     
@@ -187,7 +187,7 @@
     .detail-match-table th, .detail-match-table td { padding: 5px 2px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); vertical-align: middle; }
     .detail-match-table th { color: var(--text-muted); font-size: 0.72rem; }
 
-    /* 1. 경기명 괄호 하단 배치 처리 */
+    /* 경기명 괄호 하단 배치 처리 */
     .detail-match-table td.match-title {
       text-align: left;
       font-weight: bold;
@@ -204,7 +204,7 @@
       margin-top: 1px;
     }
 
-    /* 2. 출전 선수 이름 줄바꿈 단어 중간 잘림 방지 */
+    /* 출전 선수 이름 줄바꿈 단어 중간 잘림 방지 */
     .detail-match-table td.players-cell {
       word-break: keep-all;
       word-wrap: break-word;
@@ -212,7 +212,7 @@
       padding: 4px 2px;
     }
 
-    /* 3. 스코어(결과) 줄바꿈 절대 방지 */
+    /* 스코어(결과) 줄바꿈 방지 */
     .detail-match-table td.score-cell {
       font-weight: bold;
       white-space: nowrap !important;
@@ -274,7 +274,6 @@
         <div>
           <div class="section-title">
             <span>경기 일정 및 결과</span>
-            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(실시간)</span>
           </div>
           <div id="scheduleList" class="schedule-list"></div>
         </div>
@@ -444,7 +443,6 @@
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     }
 
-    /* 1. 경기 텍스트 분리 함수 (괄호 내용을 아래 줄로 배치) */
     function formatMatchTitle(matchName) {
       if (!matchName) return '';
       const match = matchName.match(/^(.*?)\s*(\(.*?\))$/);
