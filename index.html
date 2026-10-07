@@ -17,10 +17,10 @@
       --highlight: #f59e0b;
 
       /* 팀 시그니처 컬러 */
-      --color-sinbi: #3b82f6;   /* 신비 (파란색 톤) */
-      --color-deodeum: #eab308; /* 더듬 (노란색 톤) */
-      --color-hayden: #ef4444;  /* 헤이든 (붉은색 톤) */
-      --color-mitto: #ec4899;   /* 미또 (마젠타 톤) */
+      --color-sinbi: #3b82f6;   /* 신비 */
+      --color-deodeum: #eab308; /* 더듬 */
+      --color-hayden: #ef4444;  /* 헤이든 */
+      --color-mitto: #ec4899;   /* 미또 */
 
       --win-color: #10b981;
       --loss-color: #ef4444;
@@ -28,27 +28,27 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-color); padding: 16px 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    body { background-color: var(--bg-color); color: var(--text-color); padding: 12px 8px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
     .container { width: 100%; max-width: 1200px; }
     
-    h1 { text-align: center; margin-bottom: 20px; font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-shadow: 0 0 15px var(--accent-glow); letter-spacing: -0.5px; word-break: keep-all; }
+    h1 { text-align: center; margin-bottom: 16px; font-size: 1.35rem; font-weight: 800; color: var(--accent-color); text-shadow: 0 0 15px var(--accent-glow); letter-spacing: -0.5px; word-break: keep-all; }
     @media (min-width: 768px) { h1 { font-size: 2.2rem; margin-bottom: 24px; } body { padding: 24px; } }
 
-    .tab-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; width: 100%; }
-    .tab-btn { flex: 1; max-width: 220px; padding: 12px 16px; font-size: 0.95rem; font-weight: 700; border: 2px solid var(--accent-color); background-color: transparent; color: var(--accent-color); border-radius: 10px; cursor: pointer; transition: all 0.25s ease; text-align: center; white-space: nowrap; }
+    .tab-buttons { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; width: 100%; }
+    .tab-btn { flex: 1; max-width: 220px; padding: 10px 12px; font-size: 0.9rem; font-weight: 700; border: 2px solid var(--accent-color); background-color: transparent; color: var(--accent-color); border-radius: 10px; cursor: pointer; transition: all 0.25s ease; text-align: center; white-space: nowrap; }
     .tab-btn.active, .tab-btn:hover { background-color: var(--accent-color); color: #0b0f19; box-shadow: 0 0 15px var(--accent-glow); }
 
-    .tab-content { display: none; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6); }
+    .tab-content { display: none; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 12px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6); }
     @media (min-width: 768px) { .tab-content { padding: 24px; } }
     .tab-content.active { display: block; }
 
     /* 팀별 인원 보기 */
-    .team-grid-4 { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 600px) { .team-grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    .team-grid-4 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 600px) { .team-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
     @media (min-width: 1024px) { .team-grid-4 { grid-template-columns: repeat(4, 1fr); } }
 
-    .team-card { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; overflow: hidden; }
-    .team-card h3 { border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px; font-size: 1.15rem; text-align: center; font-weight: 800; }
+    .team-card { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; overflow: hidden; }
+    .team-card h3 { border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px; font-size: 1.1rem; text-align: center; font-weight: 800; }
 
     .team-sinbi { color: var(--color-sinbi) !important; }
     .team-deodeum { color: var(--color-deodeum) !important; }
@@ -61,60 +61,122 @@
     .member-table td.name { font-weight: 600; }
     .member-table td.score { color: var(--highlight); font-weight: 700; }
 
-    /* 일정 및 순위 Layout (팀 순위표 상단 배치) */
-    .schedule-standings-container { display: flex; flex-direction: column; gap: 24px; }
+    /* 일정 및 순위 Layout */
+    .schedule-standings-container { display: flex; flex-direction: column; gap: 20px; }
     @media (min-width: 900px) { 
       .schedule-standings-container { 
         display: grid; 
         grid-template-columns: 0.8fr 1.2fr; 
+        gap: 24px;
       } 
     }
 
-    .section-title { font-size: 1.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
-    .schedule-list { display: flex; flex-direction: column; gap: 12px; }
+    .section-title { font-size: 1.1rem; font-weight: 800; color: var(--accent-color); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+    .schedule-list { display: flex; flex-direction: column; gap: 10px; }
     .schedule-item { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: all 0.2s ease; }
     
-    /* 지난/완료된 경기 스타일 (어두운 톤) */
+    /* 지난/완료된 경기 스타일 */
     .schedule-item.completed {
       background-color: #111726;
       border-color: #1e293b;
-      opacity: 0.65;
+      opacity: 0.7;
     }
     .schedule-item.completed:hover {
-      opacity: 0.85;
+      opacity: 0.9;
     }
     .status-badge {
-      font-size: 0.7rem;
-      padding: 2px 6px;
+      font-size: 0.68rem;
+      padding: 2px 5px;
       border-radius: 4px;
       font-weight: bold;
       margin-left: 6px;
+      white-space: nowrap;
     }
     .badge-completed { background-color: #334155; color: #94a3b8; }
     .badge-upcoming { background-color: #0284c7; color: #ffffff; }
 
-    .schedule-header { padding: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background-color: rgba(255, 255, 255, 0.02); transition: background-color 0.2s ease; }
+    /* 모바일 줄바꿈 방지 수정 영역 */
+    .schedule-header { 
+      padding: 10px 12px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      cursor: pointer; 
+      background-color: rgba(255, 255, 255, 0.02); 
+      transition: background-color 0.2s ease;
+      gap: 8px;
+    }
     .schedule-header:hover { background-color: rgba(255, 255, 255, 0.05); }
-    .schedule-info { display: flex; flex-direction: column; gap: 4px; }
-    .schedule-date { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; }
-    .schedule-teams { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-    .schedule-score { font-size: 1.15rem; font-weight: 800; color: var(--highlight); padding: 4px 10px; background-color: var(--bg-color); border-radius: 6px; border: 1px solid var(--border-color); }
-    .toggle-icon { font-size: 0.8rem; color: var(--text-muted); margin-left: 8px; transition: transform 0.25s ease; }
+    
+    .schedule-info { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 3px; 
+      min-width: 0; /* flex 자식이 overflow 시 축소 가능하도록 적용 */
+      flex: 1;
+    }
+    .schedule-date { 
+      font-size: 0.75rem; 
+      color: var(--text-muted); 
+      display: flex; 
+      align-items: center; 
+      white-space: nowrap;
+    }
+    .schedule-teams { 
+      font-size: 0.95rem; 
+      font-weight: 800; 
+      display: flex; 
+      align-items: center; 
+      gap: 4px; 
+      white-space: nowrap; 
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .schedule-teams span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .schedule-result-box {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0; /* 줄바꿈 방지: 크기 고정 */
+    }
+
+    .schedule-score { 
+      font-size: 1rem; 
+      font-weight: 800; 
+      color: var(--highlight); 
+      padding: 3px 8px; 
+      background-color: var(--bg-color); 
+      border-radius: 6px; 
+      border: 1px solid var(--border-color); 
+      white-space: nowrap;
+    }
+    .toggle-icon { 
+      font-size: 0.75rem; 
+      color: var(--text-muted); 
+      margin-left: 2px; 
+      transition: transform 0.25s ease; 
+      flex-shrink: 0;
+    }
     .schedule-item.active .toggle-icon { transform: rotate(180deg); }
 
-    .schedule-detail { display: none; padding: 14px; border-top: 1px dashed var(--border-color); background-color: var(--bg-color); }
+    .schedule-detail { display: none; padding: 12px; border-top: 1px dashed var(--border-color); background-color: var(--bg-color); }
     .schedule-item.active .schedule-detail { display: block; }
-    .detail-match-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .detail-match-table th, .detail-match-table td { padding: 8px 4px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-    .detail-match-table th { color: var(--text-muted); font-size: 0.78rem; }
+    .detail-match-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .detail-match-table th, .detail-match-table td { padding: 6px 2px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .detail-match-table th { color: var(--text-muted); font-size: 0.75rem; }
     .winner-pts { color: var(--win-color); font-weight: bold; }
 
-    .standings-card { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; }
-    .standings-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    .standings-table th, .standings-table td { padding: 10px 4px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-    .standings-table th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; }
+    .standings-card { background-color: var(--card-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; }
+    .standings-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .standings-table th, .standings-table td { padding: 8px 2px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .standings-table th { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; }
     .rank-num { font-weight: bold; color: var(--accent-color); }
-    .pts-num { color: var(--highlight); font-weight: bold; font-size: 1rem; }
+    .pts-num { color: var(--highlight); font-weight: bold; font-size: 0.95rem; }
   </style>
 </head>
 <body>
@@ -155,7 +217,7 @@
         <div>
           <div class="section-title">
             <span>경기 일정 및 결과</span>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(실시간)</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(실시간)</span>
           </div>
           <div id="scheduleList" class="schedule-list"></div>
         </div>
@@ -170,7 +232,6 @@
   </div>
 
   <script>
-    // 구글 Apps Script 웹 앱 URL
     const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwA2jQmq7vsXyd6Mk5ABT27fjgWneVPjTXavW5Ivav6rNGM1nLnPLEIVeNL97S8o0a5/exec";
 
     const playersData = [
@@ -286,7 +347,6 @@
       }).join('');
     }
 
-    // 구글 시트 데이터 로드
     async function loadSchedulesFromGoogleSheet() {
       const scheduleContainer = document.getElementById('scheduleList');
       if (scheduleContainer) {
@@ -341,7 +401,7 @@
 
       const now = new Date();
 
-      // 예정 경기(미래) 및 지난 경기(과거) 정렬 로직
+      // 날짜 정렬 조건 적용
       const sortedSchedules = [...matchSchedules].sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
@@ -349,11 +409,9 @@
         const isPastA = dateA < now;
         const isPastB = dateB < now;
 
-        // 1. 예정 경기는 지난 경기보다 무조건 상단
         if (!isPastA && isPastB) return -1;
         if (isPastA && !isPastB) return 1;
 
-        // 2 & 3. 같은 그룹끼리는 가장 이른 날짜 순서대로 정렬 (오름차순)
         return dateA - dateB;
       });
 
@@ -391,11 +449,11 @@
                 </span>
                 <div class="schedule-teams">
                   <span class="${classA}">${item.teamA}</span>
-                  <span style="color:var(--text-muted); font-size:0.8rem;">vs</span>
+                  <span style="color:var(--text-muted); font-size:0.75rem; font-weight:normal;">vs</span>
                   <span class="${classB}">${item.teamB}</span>
                 </div>
               </div>
-              <div style="display:flex; align-items:center;">
+              <div class="schedule-result-box">
                 <div class="schedule-score">${item.scoreA} : ${item.scoreB}</div>
                 <span class="toggle-icon">▼</span>
               </div>
