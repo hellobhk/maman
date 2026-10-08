@@ -347,7 +347,6 @@
       { name: "파인", grade: "A", score: 4, team: "신비" },
       { name: "희진럽", grade: "A", score: 4, team: "신비" },
       { name: "안", grade: "B", score: 3, team: "신비" },
-      { name: "수고", grade: "C", score: 2, team: "신비" },
       { name: "조아", grade: "C", score: 2, team: "신비" },
 
       { name: "순삼", grade: "SB", score: 8, team: "헤이든" },
@@ -410,7 +409,7 @@
     function renderTeamView() {
       const teamGrid = document.getElementById('teamGrid');
       teamGrid.innerHTML = targetTeams.map(teamName => {
-        // targetTeams에 포함된 공식 소속팀 인원만 카드에 표시 (lala는 제외됨)
+        // targetTeams에 포함된 공식 소속팀 인원만 카드에 표시
         const teamPlayers = playersData.filter(p => p.team === teamName);
         const colorClass = getTeamColorClass(teamName);
 
