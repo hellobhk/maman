@@ -298,6 +298,9 @@
     const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwA2jQmq7vsXyd6Mk5ABT27fjgWneVPjTXavW5Ivav6rNGM1nLnPLEIVeNL97S8o0a5/exec";
 
     const playersData = [
+      // 페이지 노출되지 않는 대체 인원 (팀명 비워둠)
+      { name: "lala", grade: "B", score: 3, team: "" },
+
       { name: "엠비", grade: "SC", score: 7, team: "더듬" },
       { name: "케이", grade: "SC", score: 7, team: "더듬" },
       { name: "루시퍼", grade: "SC", score: 7, team: "더듬" },
@@ -407,6 +410,7 @@
     function renderTeamView() {
       const teamGrid = document.getElementById('teamGrid');
       teamGrid.innerHTML = targetTeams.map(teamName => {
+        // targetTeams에 포함된 공식 소속팀 인원만 카드에 표시 (lala는 제외됨)
         const teamPlayers = playersData.filter(p => p.team === teamName);
         const colorClass = getTeamColorClass(teamName);
 
