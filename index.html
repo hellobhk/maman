@@ -234,7 +234,6 @@
     .standings-table th { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; }
     .rank-num { font-weight: bold; color: var(--accent-color); }
     .total-wins-num { color: var(--highlight); font-weight: bold; font-size: 0.9rem; }
-    .pts-num { color: var(--text-color); font-weight: bold; font-size: 0.95rem; }
   </style>
 </head>
 <body>
@@ -270,7 +269,6 @@
                   <th>경기</th>
                   <th>승/무/패</th>
                   <th>승점 합계</th>
-                  <th>승점</th>
                 </tr>
               </thead>
               <tbody id="standingsBody"></tbody>
@@ -501,7 +499,6 @@
       renderStandings();
     }
 
-    // 최신 날짜 경기가 상단에 위치하도록 정렬 로직 수정
     function renderScheduleList() {
       const scheduleContainer = document.getElementById('scheduleList');
       if (!matchSchedules || matchSchedules.length === 0) {
@@ -638,7 +635,6 @@
 
       standingsBody.innerHTML = sortedTeams.map((t, idx) => {
         const colorClass = getTeamColorClass(t.team);
-        const ptsDisplay = t.pts > 0 ? `+${t.pts}` : `${t.pts}`;
 
         return `
           <tr>
@@ -647,7 +643,6 @@
             <td>${t.played}</td>
             <td>${t.win}/${t.draw}/${t.loss}</td>
             <td class="total-wins-num">${t.totalIndividualWins}점</td>
-            <td class="pts-num">${ptsDisplay}</td>
           </tr>
         `;
       }).join('');
