@@ -218,6 +218,11 @@
       margin-left: 2px;
       white-space: nowrap;
     }
+    .race-tag {
+      font-size: 0.7rem;
+      color: var(--accent-color);
+      font-weight: normal;
+    }
 
     /* 스코어(결과) 줄바꿈 방지 */
     .detail-match-table td.score-cell {
@@ -366,7 +371,6 @@
       { name: "최", grade: "B", score: 3, team: "헤이든" }
     ];
 
-    // 더듬과 헤이든의 순서를 교체 (신비, 헤이든, 더듬, 미또)
     const targetTeams = ["신비", "헤이든", "더듬", "미또"];
     let matchSchedules = [];
 
@@ -374,19 +378,35 @@
     const playerScoreMap = new Map();
     playersData.forEach(p => playerScoreMap.set(p.name.trim(), Number(p.score) || 0));
 
-    // 출전 선수 목록 합계 점수 계산 및 텍스트 렌더링 함수
+    // 종족 표시 포맷 및 선수점수 합산 함수
     function renderPlayersWithScore(players) {
       if (!players || players.length === 0) return '-';
       
       let totalScore = 0;
-      players.forEach(name => {
-        const trimmedName = name.trim();
-        if (playerScoreMap.has(trimmedName)) {
-          totalScore += playerScoreMap.get(trimmedName);
+      const parsedPlayers = players.map(rawName => {
+        let name = rawName.trim();
+        let race = "";
+
+        // 이름에 종족 정보(P/Z/T/R 또는 프로토스/저그/테란/랜덤) 포함되어 있는지 파싱
+        const raceMatch = name.match(/^(.*?)\s*[\(\[\{]?(프로토스\vert{}저그\vert{}테란\vert{}랜덤\vert{}[PZTRpztr])[\)\]\}]?$/);
+        if (raceMatch) {
+          name = raceMatch[1].trim();
+          let rawRace = raceMatch[2].toUpperCase();
+          if (rawRace === "프로토스") race = "P";
+          else if (rawRace === "저그") race = "Z";
+          else if (rawRace === "테란") race = "T";
+          else if (rawRace === "랜덤") race = "R";
+          else race = rawRace;
         }
+
+        if (playerScoreMap.has(name)) {
+          totalScore += playerScoreMap.get(name);
+        }
+
+        return race ? `${name}<span class="race-tag">(${race})</span>` : name;
       });
 
-      const playerNamesStr = players.join(', ');
+      const playerNamesStr = parsedPlayers.join(', ');
       return `${playerNamesStr} <span class="players-score">(합계: ${totalScore}점)</span>`;
     }
 
@@ -410,7 +430,6 @@
     function renderTeamView() {
       const teamGrid = document.getElementById('teamGrid');
       teamGrid.innerHTML = targetTeams.map(teamName => {
-        // targetTeams에 포함된 공식 소속팀 인원만 카드에 표시
         const teamPlayers = playersData.filter(p => p.team === teamName);
         const colorClass = getTeamColorClass(teamName);
 
@@ -549,7 +568,7 @@
                 </div>
               </div>
               <div class="schedule-result-box">
-                <div class="schedule-score">${item.scoreA} : ${item.scoreB}</div>
+                <div class="schedule-score">${item.scoreA || 0} : ${item.scoreB || 0}</div>
                 <span class="toggle-icon">▼</span>
               </div>
             </div>
@@ -576,6 +595,7 @@
       if (elem) elem.classList.toggle('active');
     }
 
+    // 팀 순위표 승점 및 단판승합 계산 (승리 시 +1점, 무승부/패배 시 +0점)
     function renderStandings() {
       const standingsBody = document.getElementById('standingsBody');
       const teamStats = {};
@@ -583,28 +603,44 @@
         teamStats[t] = { team: t, played: 0, win: 0, draw: 0, loss: 0, totalIndividualWins: 0, pts: 0 };
       });
 
+      // 동일 대진 분리 경기들의 점수 합산을 위해 그룹화
+      const matchupGroup = {};
+
       (matchSchedules || []).forEach(m => {
+        const key = [m.teamA, m.teamB].sort().join('_vs_');
+        if (!matchupGroup[key]) {
+          matchupGroup[key] = { teamA: m.teamA, teamB: m.teamB, scoreA: 0, scoreB: 0, isPlayed: false };
+        }
+
+        const details = m.details || [];
+        const hasIndividualWin = details.some(d => Number(d.winA || 0) > 0 || Number(d.winB || 0) > 0);
+
+        if (hasIndividualWin) {
+          matchupGroup[key].isPlayed = true;
+          matchupGroup[key].scoreA += Number(m.scoreA || 0);
+          matchupGroup[key].scoreB += Number(m.scoreB || 0);
+        }
+      });
+
+      // 합산된 매치 결과를 기반으로 순위 계산
+      Object.values(matchupGroup).forEach(m => {
         const tA = teamStats[m.teamA];
         const tB = teamStats[m.teamB];
 
-        if (tA && tB) {
-          const details = m.details || [];
-          const isPlayed = details.some(d => Number(d.winA || 0) > 0 || Number(d.winB || 0) > 0);
+        if (tA && tB && m.isPlayed) {
+          tA.played += 1;
+          tB.played += 1;
 
-          if (isPlayed) {
-            tA.played += 1;
-            tB.played += 1;
+          tA.totalIndividualWins += m.scoreA;
+          tB.totalIndividualWins += m.scoreB;
 
-            tA.totalIndividualWins += Number(m.scoreA || 0);
-            tB.totalIndividualWins += Number(m.scoreB || 0);
-
-            if (Number(m.scoreA) > Number(m.scoreB)) {
-              tA.win += 1; tA.pts += 3; tB.loss += 1;
-            } else if (Number(m.scoreB) > Number(m.scoreA)) {
-              tB.win += 1; tB.pts += 3; tA.loss += 1;
-            } else {
-              tA.draw += 1; tA.pts += 1; tB.draw += 1; tB.pts += 1;
-            }
+          // 매치 결과 승점 계산 (승리: 1점, 무승부/패배: 0점)
+          if (m.scoreA > m.scoreB) {
+            tA.win += 1; tA.pts += 1; tB.loss += 1;
+          } else if (m.scoreB > m.scoreA) {
+            tB.win += 1; tB.pts += 1; tA.loss += 1;
+          } else {
+            tA.draw += 1; tB.draw += 1;
           }
         }
       });
